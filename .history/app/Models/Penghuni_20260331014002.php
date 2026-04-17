@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Penghuni extends Model
+{
+    use HasFactory;
+
+    protected $table = 'penghuni';
+
+    protected $fillable = [
+        'nama',
+        'no_ktp',
+        'email',
+        'telepon',
+        'alamat',
+        'blok_rumah',
+        'no_rumah',
+        'status',
+        'status_huni',
+        'tanggal_masuk',
+        'tanggal_keluar',
+    ];
+
+    // 🔥 RELASI KE RUMAH
+    public function rumah()
+    {
+        return $this->belongsTo(Rumah::class, 'rumah_id');
+    }
+}
+
