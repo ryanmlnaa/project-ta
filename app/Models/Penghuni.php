@@ -27,9 +27,9 @@ class Penghuni extends Model
     ];
 
     // 🔥 RELASI KE RUMAH
-   public function rumah()
+    public function rumah()
     {
-        return $this->belongsTo(Rumah::class, 'rumah_id');
+        return $this->belongsTo(\App\Models\Rumah::class, 'rumah_id');
     }
 
     public function user()

@@ -19,7 +19,7 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-   public function prosesLogin(Request $request)
+    public function prosesLogin(Request $request)
     {
         $request->validate([
             'login' => 'required',
@@ -27,26 +27,17 @@ class AuthController extends Controller
         ]);
 
         $login = $request->login;
-
         $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         if (Auth::attempt([$field => $login, 'password' => $request->password])) {
-
             $request->session()->regenerate();
 
-          $user = Auth::user();
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
 
-            if ($user->role == 'admin') {
-                return redirect('/admin/dashboard');
-            }
-
-            if ($user->role == 'rt') {
-                return redirect('/rt/dashboard');
-            }
-
-           return match($user->role) {
+            return match($user->role) {
                 'admin' => redirect('/admin/dashboard'),
-                'rt' => redirect('/rt/iuran'),
+                'rt'    => redirect('/rt/iuran'),
                 default => redirect('/user/home'),
             };
         }
@@ -63,23 +54,19 @@ class AuthController extends Controller
 
     public function prosesRegister(Request $request)
     {
-        // VALIDASI
         $request->validate([
-            'name' => 'required',
+            'name'     => 'required',
             'username' => 'required|unique:users,username',
-            'email' => 'required|email|unique:users,email',
+            'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6',
         ]);
 
-        // DEBUG (WAJIB COBA)
-        // dd($request->all());
-
         User::create([
-            'name' => $request->name,
-            'username' => $request->username, // 🔥 INI WAJIB ADA
-            'email' => $request->email,
+            'name'     => $request->name,
+            'username' => $request->username,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user'
+            'role'     => 'user'
         ]);
 
         return redirect('/login')->with('success', 'Register berhasil');
@@ -96,6 +83,8 @@ class AuthController extends Controller
 
         return redirect('/login');
     }
+
+    // ================= FORGOT PASSWORD =================
 
     public function forgotForm()
     {
@@ -116,7 +105,7 @@ class AuthController extends Controller
 
         $otp = rand(100000, 999999);
 
-        $user->otp_code = $otp;
+        $user->otp_code    = $otp;
         $user->otp_expired = now()->addMinutes(5);
         $user->save();
 
@@ -155,12 +144,12 @@ class AuthController extends Controller
         return redirect()->route('password.reset');
     }
 
-        public function resetForm()
+    public function resetForm()
     {
         return view('auth.reset');
     }
 
-        public function resetPassword(Request $request)
+    public function resetPassword(Request $request)
     {
         $request->validate([
             'password' => 'required|min:6|confirmed'
@@ -172,8 +161,8 @@ class AuthController extends Controller
             return redirect()->route('password.forgot');
         }
 
-        $user->password = Hash::make($request->password);
-        $user->otp_code = null;
+        $user->password    = Hash::make($request->password);
+        $user->otp_code    = null;
         $user->otp_expired = null;
         $user->save();
 

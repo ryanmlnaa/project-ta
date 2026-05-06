@@ -13,6 +13,7 @@ class Iuran extends Model
 
     protected $fillable = [
         'penghuni_id',
+        'rt_id',
         'bulan',
         'tahun',
         'jumlah',

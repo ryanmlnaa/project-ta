@@ -5,20 +5,34 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Iuran;
 use App\Models\Penghuni;
-use Carbon\Carbon;
+use App\Models\Rumah;
+use App\Models\Layanan;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 
 class IuranController extends Controller
 {
     public function index()
     {
-        $iuran = Iuran::with('penghuni')->get(); // relasi ke penghuni
+        $user = Auth::user();
+
+        if ($user->role == 'admin') {
+            $iuran = Iuran::with('penghuni')->get();
+        } else {
+            $iuran = Iuran::with('penghuni')
+                ->where('rt_id', $user->id)
+                ->get();
+        }
+
         return view('admin.iuran.index', compact('iuran'));
     }
 
     public function create()
     {
-        $penghuni = Penghuni::all(); // ambil data penghuni
+        $rtId = Auth::id();
+
+        $penghuni = Penghuni::where('rt_id', $rtId)->get();
+
         return view('admin.iuran.create', compact('penghuni'));
     }
 
@@ -29,63 +43,62 @@ class IuranController extends Controller
             'bulan' => 'required',
             'tahun' => 'required',
             'jumlah' => 'required',
-            'jenis_iuran' => 'required', // 🔥 WAJIB
-            'keterangan' => 'required', // 🔥 tambahkan ini
-            'status' => 'required|in:lunas,belum',
+            'jenis_iuran' => 'required',
+            'keterangan' => 'required',
         ]);
+
+        // 🔥 ambil penghuni
+        $penghuni = Penghuni::findOrFail($request->penghuni_id);
 
         Iuran::create([
             'penghuni_id' => $request->penghuni_id,
+
+            // 🔥 FIX UTAMA (ambil dari penghuni)
+            'rt_id' => $penghuni->rt_id,
+
             'bulan' => $request->bulan,
             'tahun' => $request->tahun,
             'jumlah' => $request->jumlah,
-            'jenis_iuran' => $request->jenis_iuran, // ✅
-            'keterangan' => $request->keterangan, // ✅
+            'jenis_iuran' => $request->jenis_iuran,
+            'keterangan' => $request->keterangan,
             'status' => 'belum',
-            'tanggal_bayar' => $request->status == 'lunas' ? now() : null,
         ]);
 
-        // =========================
-        // 🔥 TAMBAHAN WHATSAPP
-        // =========================
+         // 🔥 WHATSAPP
+        $penghuni = Penghuni::find($request->penghuni_id);
 
-       $penghuni = \App\Models\Penghuni::find($request->penghuni_id);
+        if ($penghuni && $penghuni->telepon) {
+            $nohp = preg_replace('/^0/', '62', $penghuni->telepon);
 
-    if ($penghuni && $penghuni->telepon) {
+            $pesan = "Halo {$penghuni->nama},\n";
+            $pesan .= "Iuran baru ditambahkan:\n";
+            $pesan .= "Bulan: {$request->bulan} {$request->tahun}\n";
+            $pesan .= "Jumlah: Rp " . number_format($request->jumlah,0,',','.') . "\n";
+            $pesan .= "Jenis: {$request->jenis_iuran}\n";
+            $pesan .= "Terima kasih 🙏";
 
-        // format nomor
-        $nohp = preg_replace('/^0/', '62', $penghuni->telepon);
-
-        $pesan = "Halo {$penghuni->nama},\n";
-        $pesan .= "Iuran baru ditambahkan:\n";
-        $pesan .= "Bulan: {$request->bulan} {$request->tahun}\n";
-        $pesan .= "Jumlah: Rp " . number_format($request->jumlah,0,',','.') . "\n";
-        $pesan .= "Jenis: {$request->jenis_iuran}\n";
-        $pesan .= "Terima kasih 🙏";
-
-        Http::withHeaders([
-            'Authorization' => env('FONNTE_TOKEN')
-        ])->post('https://api.fonnte.com/send', [
-            'target' => $nohp,
-            'message' => $pesan,
-        ]);
-    }
+            Http::withHeaders([
+                'Authorization' => env('FONNTE_TOKEN')
+            ])->post('https://api.fonnte.com/send', [
+                'target' => $nohp,
+                'message' => $pesan,
+            ]);
+        }
 
         return redirect()->route('iuran.index')
             ->with('success', 'Data iuran berhasil ditambahkan');
     }
-
     public function edit($id)
     {
-        $iuran = Iuran::findOrFail($id);
-        $penghuni = Penghuni::all();
+        $iuran = Iuran::where('rt_id', Auth::id())->findOrFail($id);
+        $penghuni = Penghuni::where('rt_id', Auth::id())->get();
 
         return view('admin.iuran.edit', compact('iuran', 'penghuni'));
     }
 
     public function update(Request $request, $id)
     {
-        $iuran = Iuran::findOrFail($id);
+        $iuran = Iuran::where('rt_id', Auth::id())->findOrFail($id);
 
         $request->validate([
             'penghuni_id' => 'required',
@@ -105,23 +118,60 @@ class IuranController extends Controller
             'jenis_iuran' => $request->jenis_iuran,
             'keterangan' => $request->keterangan,
             'status' => $request->status,
-            'tanggal_bayar' => $request->status == 'lunas'
-                ? ($request->tanggal_bayar ?? now())
-                : null,
+            'tanggal_bayar' => $request->status == 'lunas' ? now() : null,
         ]);
 
         return redirect()->route('iuran.index')->with('success', 'Data berhasil diupdate');
     }
 
-   public function destroy($id)
+    public function destroy($id)
     {
-        $iuran = Iuran::findOrFail($id);
+        $iuran = Iuran::where('rt_id', Auth::id())->findOrFail($id);
         $iuran->delete();
 
-        return redirect()->route('iuran.index')->with('success', 'Data berhasil dihapus');
+        return back()->with('success', 'Data berhasil dihapus');
     }
 
-   public function approve($id)
+    public function dashboardRT()
+    {
+        $rtId = Auth::id();
+
+       $totalPenghuni = Penghuni::count();
+        $totalRumah = Rumah::count();
+        $totalIuran = Iuran::count();
+        $totalPengaduan = Layanan::count();
+
+        $menungguRT = Iuran::where('rt_id', $rtId)
+            ->where('status', 'belum')
+            ->count();
+
+        $menungguAdmin = Iuran::where('rt_id', $rtId)
+            ->where('status', 'proses')
+            ->count();
+
+        return view('rt.dashboard', compact(
+            'totalPenghuni',
+            'totalRumah',
+            'totalIuran',
+            'totalPengaduan',
+            'menungguRT',
+            'menungguAdmin'
+        ));
+    }
+
+        public function approveRT($id)
+    {
+        $iuran = Iuran::where('rt_id', Auth::id())->findOrFail($id);
+
+        $iuran->update([
+            'status' => 'menunggu',
+            'tanggal_bayar' => now()
+        ]);
+
+        return back()->with('success', 'Dikirim ke Admin');
+    }
+
+        public function approveAdmin($id)
     {
         $iuran = Iuran::findOrFail($id);
 
@@ -130,57 +180,6 @@ class IuranController extends Controller
             'tanggal_bayar' => now()
         ]);
 
-        return back();
+        return back()->with('success', 'Iuran disetujui admin');
     }
-
-    public function realtime()
-    {
-        $iuran = Iuran::with('penghuni')->get();
-
-        return response()->json($iuran);
-    }
-
-    public function approveRT($id)
-{
-    $iuran = Iuran::findOrFail($id);
-
-    $iuran->status = 'proses'; // ke admin
-    $iuran->save();
-
-    return back()->with('success', 'Disetujui RT → ke Admin');
-}
-
-public function approveAdmin($id)
-{
-    $iuran = Iuran::findOrFail($id);
-
-    $iuran->status = 'selesai';
-    $iuran->tanggal_bayar = now();
-    $iuran->save();
-
-    return back()->with('success', 'Iuran selesai');
-}
-
-public function dashboardRT()
-{
-    // total data
-    $totalPenghuni = \App\Models\Penghuni::count();
-    $totalIuran = \App\Models\Iuran::count();
-    $totalPengaduan = \App\Models\Layanan::count();
-
-    // status khusus RT
-    $menungguRT = \App\Models\Iuran::where('status', 'belum')
-                    ->whereNotNull('bukti_pembayaran')
-                    ->count();
-
-    $menungguAdmin = \App\Models\Iuran::where('status', 'proses')->count();
-
-    return view('rt.dashboard', compact(
-        'totalPenghuni',
-        'totalIuran',
-        'totalPengaduan',
-        'menungguRT',
-        'menungguAdmin'
-    ));
-}
 }

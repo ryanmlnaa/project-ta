@@ -15,68 +15,59 @@ class UserController extends Controller
     // BERANDA USER
     // =========================
     public function index()
-    {
-        $penghuni = Penghuni::with('rumah')
-            ->where('email', Auth::user()->email)
-            ->first();
+{
+    $user = Auth::user();
 
-            // 🔥 PASTIKAN NULL JIKA TIDAK ADA
-    if (!$penghuni) {
-        $penghuni = null;
+    // 🔥 Query by EMAIL (karena user_id masih null sebelum pilih rumah)
+    $penghuni = Penghuni::with('rumah')
+        ->where('email', $user->email)
+        ->latest()
+        ->first();
+
+    $rumah = $penghuni ? $penghuni->rumah : null;
+
+    // 🔥 WAJIB ADA - dipakai di hero stats view
+    $rumahList = \App\Models\Rumah::all();
+
+    $rtUser = null;
+    if ($rumah && $rumah->rt_id) {
+        $rtUser = \App\Models\User::where('id', $rumah->rt_id)->first();
     }
 
-            // 🔥 TAMBAHAN INI
-    // if (!$penghuni) {
-    //     $penghuni = \App\Models\Penghuni::create([
-    //         'nama' => Auth::user()->name,
-    //         'no_ktp' => rand(1000000000000000, 9999999999999999),
-    //         'email' => Auth::user()->email,
-    //         'telepon' => '-',
-    //         'alamat' => '-',
-    //         'status_huni' => 'Kontrak',
-    //     ]);
-    // }
+    $iuran = collect();
+    $hidden = session()->get('hidden_iuran', []);
+    $hiddenLayanan = session()->get('hidden_layanan', []);
 
-        // 🔥 AMBIL IURAN BERDASARKAN PENGHUNI
-        $iuran = null;
-
-        $iuran = collect();
-
-        // 🔥 TAMBAHAN (JANGAN DIHAPUS)
-        $hidden = session()->get('hidden_iuran', []);
-
-        $hiddenLayanan = session()->get('hidden_layanan', []);
-
-        if ($penghuni) {
-            $iuran = \App\Models\Iuran::where('penghuni_id', $penghuni->id)
-                        ->whereNotIn('id', $hidden) // 🔥 TAMBAHAN FILTER
-                        ->orderBy('tahun', 'desc') // 🔥 tahun terbaru dulu
-                        ->orderBy('bulan', 'asc')  // 🔥 bulan urut
-                        ->get();
-        }
-
-        $pengaduan = collect();
-
-        // 🔥 TAMBAHAN INI (WAJIB)
-        $informasi = \App\Models\Informasi::orderBy('is_penting', 'desc')
-                        ->orderBy('tanggal', 'desc')
-                        ->get();
-
-        if ($penghuni) {
-            $pengaduan = \App\Models\Layanan::where('penghuni_id', $penghuni->id)
-                ->whereNotIn('id', $hiddenLayanan)
-                ->latest()
-                ->get();
-        }
-
-            $isExpired = false;
-
-        if ($penghuni && $penghuni->status == 'Tidak Aktif') {
-            $isExpired = true;
-        }
-
-      return view('user.home', compact('penghuni', 'iuran', 'pengaduan', 'informasi', 'isExpired'));
+    if ($penghuni) {
+        $iuran = \App\Models\Iuran::where('penghuni_id', $penghuni->id)
+                    ->whereNotIn('id', $hidden)
+                    ->orderBy('tahun', 'desc')
+                    ->orderBy('bulan', 'asc')
+                    ->get();
     }
+
+    $pengaduan = collect();
+    $informasi = \App\Models\Informasi::orderBy('is_penting', 'desc')
+                    ->orderBy('tanggal', 'desc')
+                    ->get();
+
+    if ($penghuni) {
+        $pengaduan = \App\Models\Layanan::where('penghuni_id', $penghuni->id)
+            ->whereNotIn('id', $hiddenLayanan)
+            ->latest()
+            ->get();
+    }
+
+    $isExpired = false;
+    if ($penghuni && $penghuni->status == 'Tidak Aktif') {
+        $isExpired = true;
+    }
+
+    return view('user.home', compact(
+        'penghuni', 'rumah', 'rumahList', 'rtUser',
+        'iuran', 'pengaduan', 'informasi', 'isExpired'
+    ));
+}
     // =========================
     // PROFIL
     // =========================
@@ -102,63 +93,81 @@ class UserController extends Controller
     // =========================
     // RUMAH
     // =========================
-    public function rumah()
-    {
-        $user = Auth::user();
+public function rumah()
+{
+    $user = Auth::user();
 
-    if (!$user) {
-        return redirect('/login');
+    $penghuni = \App\Models\Penghuni::with('rumah')
+                ->where('email', $user->email)  // 🔥 BY EMAIL, BUKAN user_id
+                ->latest()
+                ->first();
+
+    $rumah = $penghuni ? $penghuni->rumah : null;
+
+    $rtUser = null;
+    if ($rumah && $rumah->rt_id) {
+        $rtUser = \App\Models\User::where('id', $rumah->rt_id)
+                    ->where('role', 'rt')
+                    ->first();
     }
 
-    $penghuni = Penghuni::with('rumah')
-        ->where('email', $user->email)
-        ->first();
+    $rumahList = \App\Models\Rumah::all();
 
-    // 🔥 TAMBAHAN INI (WAJIB)
-    $rumahList = Rumah::all();
-
-    return view('user.rumah', compact('penghuni', 'rumahList'));
-    }
+    return view('user.rumah', compact('penghuni', 'rumah', 'rtUser', 'rumahList'));
+}
     // =========================
     // 🔥 TAMBAHAN: PILIH RUMAH
     // =========================
-    public function pilihRumah($id)
-    {
-        $rumah = Rumah::findOrFail($id);
+public function pilihRumah($id)
+{
+    $user = Auth::user();
 
-        // kalau sudah terisi
-        if ($rumah->status == 'Terisi') {
-            return back()->with('error', 'Rumah sudah terisi');
-        }
+    $rumah = \App\Models\Rumah::findOrFail($id);
 
-        // cari penghuni berdasarkan email user login
-       $penghuni = Penghuni::where('email', Auth::user()->email)->first();
-
-if (!$penghuni) {
-    return back()->with('error', 'Isi data penghuni dulu!');
-}
-
-        // kalau belum ada, buat otomatis
-        // if (!$penghuni) {
-        //     $penghuni = Penghuni::create([
-        //         'nama' => Auth::user()->name,
-        //         'email' => Auth::user()->email,
-        //         'status' => 'Aktif'
-        //     ]);
-        // }
-
-        // update rumah ke penghuni
-        $penghuni->update([
-            'rumah_id' => $rumah->id
-        ]);
-
-        // update status rumah
-        $rumah->update([
-            'status' => 'Terisi'
-        ]);
-
-        return back()->with('success', 'Berhasil memilih rumah');
+    // ❌ kalau rumah sudah terisi
+    if ($rumah->status == 'Terisi') {
+        return back()->with('error', 'Rumah sudah diambil!');
     }
+
+    // 🔥 cari penghuni berdasarkan EMAIL ATAU USER_ID
+    $penghuni = \App\Models\Penghuni::where('user_id', $user->id)
+        ->orWhere('email', $user->email)
+        ->first();
+
+    // 🔥 kalau belum ada sama sekali
+    if (!$penghuni) {
+        $penghuni = new \App\Models\Penghuni();
+    }
+
+    // 🔥 SET DATA WAJIB (update juga kalau sudah ada)
+    $penghuni->user_id = $user->id;
+    $penghuni->nama = $user->name;
+    // $penghuni->no_ktp = $user->no_ktp ?? '-';
+    $penghuni->email = $user->email;
+    // $penghuni->telepon = $user->telepon ?? 'Belum diisi';
+    // $penghuni->alamat = $user->alamat ?? 'Belum diisi';
+    $penghuni->status = 'Aktif';
+    $penghuni->status_huni = 'Tetap';
+
+    // 🔥 kalau belum ada tanggal masuk
+    if (!$penghuni->tanggal_masuk) {
+        $penghuni->tanggal_masuk = now();
+    }
+
+    // 🔥 SET RUMAH
+    $penghuni->rumah_id = $rumah->id;
+
+    // ✅ TAMBAHKAN INI (PENTING BANGET)
+    $penghuni->rt_id = $rumah->rt_id;
+
+    $penghuni->save();
+
+    // 🔥 UPDATE STATUS RUMAH
+    $rumah->status = 'Terisi';
+    $rumah->save();
+
+    return redirect()->route('user.rumah')->with('success', 'Berhasil pilih rumah!');
+}
 
     // // =========================
     // // IURAN
@@ -190,73 +199,69 @@ if (!$penghuni) {
     //     return view('user.pengumuman');
     // }
 
-   public function ambilRumah(Request $request)
+public function ambilRumah(Request $request)
 {
-    $request->validate([
-        'rumah_id' => 'required|exists:rumah,id'
-    ]);
+    $user = Auth::user();
 
-    $rumah = Rumah::findOrFail($request->rumah_id);
+    $rumah = \App\Models\Rumah::findOrFail($request->rumah_id);
 
-    if ($rumah->status == 'Terisi') {
-        return back()->with('error', 'Rumah sudah diambil!');
-    }
-
-   $penghuni = Penghuni::where('email', Auth::user()->email)->firstOrFail();
+    // 🔥 ambil penghuni yang SUDAH ADA
+    $penghuni = \App\Models\Penghuni::where('email', $user->email)->first();
 
     if (!$penghuni) {
-        return back()->with('error', 'Isi data penghuni dulu!');
+        return back()->with('error', 'Data penghuni belum ada!');
     }
 
-    if ($penghuni->rumah_id) {
-        return back()->with('error', 'Anda sudah memiliki rumah!');
-    }
+    // 🔥 hanya update yang penting saja
+    $penghuni->user_id = $user->id; // pastikan tidak null
+    $penghuni->rumah_id = $rumah->id;
+    $penghuni->rt_id = $rumah->rt_id;
 
-   $rumah->status = 'Terisi';
-$rumah->save();
+    $penghuni->save();
 
-$penghuni->rumah_id = $rumah->id;
-$penghuni->save();
+    // 🔥 update status rumah
+    $rumah->status = 'Terisi';
+    $rumah->save();
 
-    return redirect()->route('user.rumah')
-        ->with('success', 'Berhasil mengambil rumah!');
+    return redirect()->route('user.rumah')->with('success', 'Berhasil ambil rumah!');
 }
 
-  public function simpanPenghuni(Request $request)
+ public function simpanPenghuni(Request $request)
 {
     $request->validate([
-        'nama' => 'required',
-        'no_ktp' => 'required|unique:penghuni,no_ktp',
-        'telepon' => 'required',
-        'alamat' => 'required',
-        'status_huni' => 'required|in:Tetap,Kontrak',
-        'tanggal_masuk' => 'nullable|date',
+        'nama'           => 'required',
+        'no_ktp'         => 'required',
+        'telepon'        => 'required',
+        'alamat'         => 'required',
+        'status_huni'    => 'required|in:Tetap,Kontrak',
         'tanggal_keluar' => 'nullable|date'
     ]);
 
-    if (Penghuni::where('email', Auth::user()->email)->exists()) {
-    return back()->with('error', 'Data sudah pernah diisi');
-}
+    $user = Auth::user();
 
-    \App\Models\Penghuni::create([
-        // 🔥 TAMBAHAN WAJIB
-        'user_id' => \Illuminate\Support\Facades\Auth::id(),
+    // 🔥 Cek duplikat by EMAIL
+    if (Penghuni::where('email', $user->email)->exists()) {
+        return redirect()->route('user.rumah')
+                         ->with('info', 'Data penghuni sudah ada!');
+    }
 
-        'nama' => $request->nama,
-        'email' => \Illuminate\Support\Facades\Auth::user()->email,
-        'no_ktp' => $request->no_ktp,
-        'telepon' => $request->telepon,
-        'alamat' => $request->alamat,
-        'status_huni' => $request->status_huni,
-         // 🔥 FIX DI SINI (JANGAN PAKAI REQUEST)
-        'tanggal_masuk' => now(),
-
+    Penghuni::create([
+        'nama'           => $request->nama,
+        'email'          => $user->email,
+        'no_ktp'         => $request->no_ktp,
+        'telepon'        => $request->telepon,
+        'alamat'         => $request->alamat,
+        'status_huni'    => $request->status_huni,
+        'tanggal_masuk'  => now(),
         'tanggal_keluar' => $request->status_huni == 'Kontrak'
-            ? $request->tanggal_keluar
-            : null,
+                            ? $request->tanggal_keluar
+                            : null,
+        'status'         => 'Aktif',
     ]);
 
-    return redirect()->route('user.home')->with('success', 'Data penghuni berhasil disimpan');
+    // 🔥 REDIRECT KE user.rumah (bukan user.home)
+    return redirect()->route('user.rumah')
+                     ->with('success', 'Data penghuni berhasil disimpan!');
 }
 
 //   public function ambilRumah(Request $request)

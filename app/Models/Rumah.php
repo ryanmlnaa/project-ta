@@ -21,6 +21,7 @@ class Rumah extends Model
         'gambar',
         'keterangan',
         'foto',
+        'rt_id', // 🔥 TAMBAHAN UNTUK RELASI RT
         // 'denah', // 🔥 TAMBAHAN UNTUK DENAH
     ];
 
@@ -30,6 +31,11 @@ class Rumah extends Model
     public function penghuni()
     {
         return $this->hasOne(Penghuni::class, 'rumah_id', 'id');
+    }
+
+        public function rt()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'rt_id');
     }
 
 

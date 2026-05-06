@@ -31,6 +31,8 @@ return new class extends Migration
     $table->enum('status_huni', ['Tetap', 'Kontrak'])->default('Tetap');
     $table->date('tanggal_masuk')->nullable();
     $table->date('tanggal_keluar')->nullable();
+    $table->unsignedBigInteger('user_id')->nullable();
+    $table->unsignedBigInteger('rt_id')->nullable();
     $table->timestamps();
 });
     }

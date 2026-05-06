@@ -1,193 +1,248 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
+    <div class="container-fluid">
 
-    <!-- Page Heading -->
-    <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
+        <!-- Page Heading -->
+        <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
 
-    <!-- Row Statistik -->
-    <div class="row">
+        <!-- Row Statistik -->
+        <div class="row">
 
-        <!-- Total Penghuni -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Penghuni</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">120</div>
+            <!-- Total Penghuni -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Total Penghuni</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">120</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-users fa-2x text-gray-300"></i>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jumlah Rumah -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Jumlah Rumah</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">85</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-home fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Laporan Masuk -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Laporan Masuk</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">15</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaksi -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-danger shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                    Transaksi</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">Rp 12.500.000</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Jumlah Rumah -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Jumlah Rumah</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">85</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-home fa-2x text-gray-300"></i>
-                        </div>
+        <!-- Row Grafik dan Informasi -->
+        <div class="row">
+
+            <!-- Grafik -->
+            <div class="col-xl-8 col-lg-7">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Statistik Penghuni</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="myAreaChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informasi -->
+            <div class="col-xl-4 col-lg-5">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Informasi</h6>
+                    </div>
+                    <div class="card-body">
+                        <p>Selamat datang di Green View Dashboard!<br>
+                            Sistem ini membantu dalam pengelolaan penghuni, rumah, laporan, dan transaksi perumahan.</p>
+                        <a href="/laporan" class="btn btn-sm btn-primary">Lihat Laporan</a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Laporan Masuk -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Laporan Masuk</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">15</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-file-alt fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Transaksi -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-danger shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                Transaksi</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">Rp 12.500.000</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- Row Grafik dan Informasi -->
-    <div class="row">
-
-        <!-- Grafik -->
-        <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Statistik Penghuni</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="myAreaChart"></canvas>
-                </div>
-            </div>
+    <!-- 🔥 GRAFIK PENGADUAN (NEXT LEVEL) -->
+    <div class="card shadow-lg border-0 rounded-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">
+                <i class="fas fa-chart-pie text-primary"></i> Statistik Pengaduan
+            </h5>
         </div>
 
-        <!-- Informasi -->
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Informasi</h6>
-                </div>
-                <div class="card-body">
-                    <p>Selamat datang di Green View Dashboard!<br>
-                    Sistem ini membantu dalam pengelolaan penghuni, rumah, laporan, dan transaksi perumahan.</p>
-                    <a href="/laporan" class="btn btn-sm btn-primary">Lihat Laporan</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- 🔥 GRAFIK PENGADUAN (NEXT LEVEL) -->
-<div class="row">
-
-    <div class="col-xl-12 col-lg-12">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-success">Statistik Pengaduan</h6>
-            </div>
-            <div class="card-body">
+        <div class="row">
+            {{-- CHART --}}
+            <div class="col-md-6">
                 <canvas id="chartPengaduan"></canvas>
             </div>
+
+            {{-- DETAIL ANGKA --}}
+            <div class="col-md-6 d-flex flex-column justify-content-center">
+                <div class="mb-3">
+                    <i class="fas fa-file-alt text-secondary"></i>
+                    Diajukan: <strong>{{ $diajukan ?? 0 }}</strong>
+                </div>
+
+                <div class="mb-3">
+                    <i class="fas fa-hourglass-half text-warning"></i>
+                    Menunggu: <strong>{{ $menunggu ?? 0 }}</strong>
+                </div>
+
+                <div>
+                    <i class="fas fa-check-circle text-success"></i>
+                    Selesai: <strong>{{ $selesai ?? 0 }}</strong>
+                </div>
+            </div>
         </div>
     </div>
-
-</div>
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    var ctx = document.getElementById("myAreaChart").getContext("2d");
-    var myLineChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-            datasets: [{
-                label: "Penghuni Baru",
-                lineTension: 0.3,
-                backgroundColor: "rgba(78, 115, 223, 0.05)",
-                borderColor: "rgba(78, 115, 223, 1)",
-                pointRadius: 3,
-                pointBackgroundColor: "rgba(78, 115, 223, 1)",
-                pointBorderColor: "rgba(78, 115, 223, 1)",
-                pointHoverRadius: 3,
-                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-                pointHitRadius: 10,
-                pointBorderWidth: 2,
-                data: [5, 8, 6, 10, 12, 7],
-            }],
-        },
-    });
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById("myAreaChart").getContext("2d");
+        var myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+                datasets: [{
+                    label: "Penghuni Baru",
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(78, 115, 223, 0.05)",
+                    borderColor: "rgba(78, 115, 223, 1)",
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
+                    data: [5, 8, 6, 10, 12, 7],
+                }],
+            },
+        });
+    </script>
 @endpush
 
 <script>
-    // 🔥 DATA DINAMIS (AMAN JIKA BELUM ADA DATA)
-    var diajukan = {{ \App\Models\Layanan::where('status','diajukan')->count() ?? 0 }};
-    var diproses = {{ \App\Models\Layanan::where('status','diproses')->count() ?? 0 }};
-    var selesai  = {{ \App\Models\Layanan::where('status','selesai')->count() ?? 0 }};
+    document.addEventListener("DOMContentLoaded", function () {
 
-    var ctx2 = document.getElementById("chartPengaduan").getContext("2d");
+        const data = [
+        {{ $diajukan ?? 0 }},
+        {{ $menunggu ?? 0 }},
+            {{ $selesai ?? 0 }}
+        ];
 
-    new Chart(ctx2, {
-        type: 'bar',
-        data: {
-            labels: ["Diajukan", "Diproses", "Selesai"],
-            datasets: [{
-                label: "Jumlah Pengaduan",
-                data: [diajukan, diproses, selesai],
-                backgroundColor: [
-                    "#6c757d",
-                    "#f6c23e",
-                    "#1cc88a"
-                ],
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false
+        const total = data.reduce((a, b) => a + b, 0);
+
+        const ctx = document.getElementById('chartPengaduan');
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Diajukan', 'Menunggu', 'Selesai'],
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        '#6c757d',
+                        '#ffc107',
+                        '#28a745'
+                    ],
+                    borderWidth: 3,
+                    hoverOffset: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '70%', // 🔥 bikin donut modern
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let value = context.raw;
+                                let percent = ((value / total) * 100).toFixed(1);
+                                return context.label + ": " + value + " (" + percent + "%)";
+                            }
+                        }
+                    }
                 }
-            }
-        }
+            },
+            plugins: [{
+                id: 'centerText',
+                beforeDraw(chart) {
+                    const { width, height, ctx } = chart;
+                    ctx.restore();
+
+                    ctx.font = "bold 22px sans-serif";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = "#333";
+
+                    ctx.fillText(total + " Total", width / 2, height / 2);
+                    ctx.save();
+                }
+            }]
+        });
+
     });
 </script>

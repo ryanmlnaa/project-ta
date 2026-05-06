@@ -8,26 +8,36 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('iuran', function (Blueprint $table) {
+            Schema::create('iuran', function (Blueprint $table) {
             $table->id();
+
             $table->unsignedBigInteger('penghuni_id');
+            $table->unsignedBigInteger('rt_id'); // 🔥 WAJIB
+
             $table->string('bulan');
             $table->year('tahun');
             $table->decimal('jumlah', 12, 2);
-            $table->string('jenis_iuran')->nullable(); // contoh: keamanan, kebersihan
+
+            $table->string('jenis_iuran')->nullable();
             $table->text('keterangan')->nullable();
-            $table->enum('status', ['lunas', 'belum'])->default('belum');
+
+            $table->enum('status', ['belum', 'menunggu', 'lunas'])->default('belum');
             $table->date('tanggal_bayar')->nullable();
 
-            // 🔥 TAMBAHAN INI
             $table->string('bukti_pembayaran')->nullable();
 
             $table->timestamps();
 
+            // RELASI
             $table->foreign('penghuni_id')
-                  ->references('id')
-                  ->on('penghuni')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('penghuni')
+                ->onDelete('cascade');
+
+            $table->foreign('rt_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 

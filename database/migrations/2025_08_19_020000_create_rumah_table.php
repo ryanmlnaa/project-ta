@@ -21,6 +21,8 @@ return new class extends Migration
     $table->string('gambar')->nullable();
     $table->text('keterangan')->nullable();
     $table->string('foto')->nullable();
+    $table->unsignedBigInteger('rt_id')->nullable();
+
     $table->timestamps();
 });
 }

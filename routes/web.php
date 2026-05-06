@@ -12,7 +12,9 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserIuranController;
 use App\Http\Controllers\UserLayananController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Mail;
+
 /*
 |--------------------------------------------------------------------------
 | AUTH
@@ -85,19 +87,34 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::delete('/rumah/{id}', [PenghuniController::class, 'destroyRumah'])
         ->name('rumah.destroy');
 
+    Route::get('/bagi-rt', [PenghuniController::class, 'bagiRT'])->name('bagi.rt');
+
+    Route::get('/rt/penghuni', [PenghuniController::class, 'indexRT'])->name('rt.penghuni');
+
+//    Route::get('/rt/dashboard', [PenghuniController::class, 'dashboardRT'])
+//     ->name('rt.dashboard');
+    Route::get('/rt/rumah', [PenghuniController::class, 'rumahRT'])->name('rt.rumah');
+    Route::get('/rt/iuran', [PenghuniController::class, 'iuranRT'])->name('rt.iuran');
+
 
     // =========================
     // IURAN
     // =========================
-    Route::prefix('iuran')->group(function () {
-        Route::get('/', [IuranController::class, 'index'])->name('iuran.index');
-        Route::get('/create', [IuranController::class, 'create'])->name('iuran.create');
-        Route::post('/store', [IuranController::class, 'store'])->name('iuran.store');
-        Route::get('/edit/{id}', [IuranController::class, 'edit'])->name('iuran.edit');
-        Route::put('/iuran/update/{id}', [IuranController::class, 'update'])->name('iuran.update');
-        Route::delete('/iuran/{id}', [IuranController::class, 'destroy'])->name('iuran.destroy');
-        Route::post('/iuran/approve/{id}', [IuranController::class, 'approve'])->name('iuran.approve');
-    });
+   Route::prefix('iuran')->group(function () {
+
+    // ADMIN / MASTER IURAN
+    Route::get('/', [IuranController::class, 'index'])->name('iuran.index');
+    Route::get('/create', [IuranController::class, 'create'])->name('iuran.create');
+    Route::post('/store', [IuranController::class, 'store'])->name('iuran.store');
+    Route::get('/edit/{id}', [IuranController::class, 'edit'])->name('iuran.edit');
+    Route::put('/update/{id}', [IuranController::class, 'update'])->name('iuran.update');
+    Route::delete('/{id}', [IuranController::class, 'destroy'])->name('iuran.destroy');
+    Route::post('/approve/{id}', [IuranController::class, 'approve'])->name('iuran.approve');
+
+    // 🔥 USER IURAN (BEDAKAN URL BIAR TIDAK TABRAKAN)
+    Route::get('/user', [UserIuranController::class, 'index'])->name('user.iuran');
+
+});
 
     // =========================
     // LAYANAN
@@ -110,6 +127,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     Route::put('/layanan/tanggapi/{id}', [LayananController::class, 'tanggapi'])
     ->name('layanan.tanggapi');
+
+    Route::get('/admin/layanan', [LayananController::class, 'indexAdmin'])
+    ->name('admin.layanan');
 
     });
 
@@ -130,6 +150,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
         //user
         Route::get('/admin/user', [AdminUserController::class, 'index'])->name('admin.user.index');
+        Route::get('/user/create', [AdminUserController::class, 'create'])->name('admin.user.create');
+        Route::post('/user/store', [AdminUserController::class, 'store'])->name('admin.user.store');
         Route::get('/admin/user/edit/{id}', [AdminUserController::class, 'edit'])->name('admin.user.edit');
         Route::put('/admin/user/update/{id}', [AdminUserController::class, 'update'])->name('admin.user.update');
         Route::delete('/admin/user/delete/{id}', [AdminUserController::class, 'destroy'])->name('admin.user.delete');
@@ -153,6 +175,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     });
 
+     Route::get('/rt/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'role:rt'])
+    ->name('rt.dashboard');
+
+    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
+    ->middleware(['auth','role:admin'])
+    ->name('admin.dashboard');
+
     // ================= RT =================
     Route::middleware(['auth', 'role:rt'])->group(function () {
 
@@ -162,12 +192,17 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
         Route::post('/layanan/{id}/tanggapi-rt', [LayananController::class, 'tanggapiRT'])->name('layanan.tanggapi.rt');
 
-         Route::get('/rt/dashboard', [IuranController::class, 'dashboardRT'])
-        ->name('rt.dashboard');
+        //  Route::get('/rt/dashboard', [IuranController::class, 'dashboardRT'])
+        // ->name('rt.dashboard');
 
         Route::get('/rt/penghuni', [PenghuniController::class, 'indexRT'])
         ->name('rt.penghuni');
+    });
 
+       Route::middleware(['auth'])->group(function () {
+            Route::get('/rt/profile',                [ProfileController::class, 'editProfile'])->name('rt.profile');
+            Route::post('/rt/profile/update',        [ProfileController::class, 'updateprofile'])->name('rt.updateprofile');
+            Route::post('/rt/profile/upload-photo',  [ProfileController::class, 'uploadPhotoRT'])->name('rt.upload.photo');
     });
 
 
@@ -201,14 +236,14 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->group(function () {
     // =========================
     Route::get('/rumah', [UserController::class, 'rumah'])->name('user.rumah');
 
-    Route::get('/pilih-rumah/{id}', [UserController::class, 'pilihRumah'])
-        ->name('user.pilih.rumah');
+    Route::post('/pilih-rumah/{id}', [UserController::class, 'pilihRumah'])
+    ->name('user.pilih.rumah');
 
     Route::post('/simpan-rumah', [UserController::class, 'simpanRumah'])
         ->name('user.simpan.rumah');
 
-    Route::post('/ambil-rumah', [UserController::class, 'ambilRumah'])
-        ->name('user.ambil.rumah');
+    Route::post('/user/ambil-rumah', [UserController::class, 'ambilRumah'])
+    ->name('user.ambil.rumah');
 
     Route::put('/rumah/update/{id}', [PenghuniController::class, 'updateRumah']);
 
@@ -271,7 +306,16 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->group(function () {
 
     Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])
         ->name('user.upload.photo');
+
+    Route::get('/user/profil',          [ProfileController::class, 'profil'])->name('profile.edit');
+    Route::put('/user/profil/update',   [ProfileController::class, 'updateProfil'])->name('user.profil.update');
+
+        // Profil RT
+    // Route::get('/rt/profil',          [ProfileController::class, 'rtProfil'])->name('rt.profil');
+    // Route::post('/rt/profil/update',  [ProfileController::class, 'rtUpdateProfile'])->name('rt.updateprofile');
+
 });
+
 
 
 /*

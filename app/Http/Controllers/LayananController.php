@@ -8,16 +8,38 @@ use App\Models\Penghuni;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotifPengaduan;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 
 class LayananController extends Controller
 {
-    public function index()
-    {
-        $layanan = Layanan::with('penghuni')->latest()->get();
-        $penghuni = Penghuni::all();
+     public function index()
+{
+    $user = Auth::user();
 
-        return view('admin.layanan.index', compact('layanan', 'penghuni'));
+    // 🔥 ADMIN
+    if ($user->role == 'admin') {
+
+        $layanan = Layanan::with('penghuni')
+            ->whereIn('status', ['menunggu', 'selesai']) // ✅ FIX DI SINI
+            ->latest()
+            ->get();
     }
+
+    // 🔥 RT
+    else {
+
+        $rtId = $user->id;
+
+        $layanan = Layanan::with('penghuni')
+            ->whereHas('penghuni', function ($q) use ($rtId) {
+                $q->where('rt_id', $rtId);
+            })
+            ->latest()
+            ->get();
+    }
+
+    return view('admin.layanan.index', compact('layanan'));
+}
 
     public function store(Request $request)
     {
@@ -124,28 +146,31 @@ class LayananController extends Controller
     }
 
     public function tanggapiRT(Request $request, $id)
-    {
-        $request->validate([
-            'tanggapan_admin' => 'required'
-        ]);
+{
+    $request->validate([
+        'tanggapan_admin' => 'required'
+    ]);
 
-        $layanan = Layanan::with('penghuni')->findOrFail($id);
+    $layanan = Layanan::with('penghuni')->findOrFail($id);
 
-        $layanan->tanggapan_admin = $request->tanggapan_admin;
-        $layanan->status = 'proses';
-        $layanan->save();
+    // ✅ update data yg dipilih
+    $layanan->tanggapan_admin = $request->tanggapan_admin;
 
-        // 🔥 KIRIM NOTIF
-        $this->kirimNotif($layanan);
+    // 🔥 kirim ke admin
+    $layanan->status = 'menunggu';
 
-        return back()->with('success', 'Ditanggapi RT + Notif terkirim');
-    }
+    $layanan->save(); // ✅ BENAR
+
+    $this->kirimNotif($layanan);
+
+    return back()->with('success', 'Berhasil ditanggapi RT');
+}
 
     public function approveAdmin($id)
     {
-        $layanan = Layanan::with('penghuni')->findOrFail($id);
+        $layanan = Layanan::findOrFail($id);
 
-        $layanan->status = 'selesai';
+        $layanan->status = 'selesai'; // ✅ WAJIB
         $layanan->save();
 
         // 🔥 KIRIM NOTIF
@@ -199,6 +224,16 @@ class LayananController extends Controller
             Mail::to($layanan->penghuni->email)
                 ->send(new NotifPengaduan($layanan));
         }
+    }
+
+        public function indexAdmin()
+    {
+        $layanan = Layanan::with('penghuni')
+            ->where('status', 'menunggu') // 🔥 hanya dari RT
+            ->latest()
+            ->get();
+
+        return view('admin.layanan.index', compact('layanan'));
     }
 
 

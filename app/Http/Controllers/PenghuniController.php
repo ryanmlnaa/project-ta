@@ -7,13 +7,16 @@ use App\Models\Penghuni;
 use App\Models\Rumah;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Layanan;
 
 class PenghuniController extends Controller
 {
     // =========================
     // TAMPILKAN DATA
     // =========================
-   public function index(Request $request)
+    public function index(Request $request)
     {
         // tambah rumah dari modal
         if ($request->has('blok')) {
@@ -26,6 +29,12 @@ class PenghuniController extends Controller
                 $file->move(public_path('foto_rumah'), $namaFile);
             }
 
+            $rtId = $this->getRtOtomatis($request->blok);
+
+            if (!$rtId) {
+                return back()->with('error', 'Blok tidak dikenali!');
+            }
+
             Rumah::create([
                 'blok' => $request->blok,
                 'no_rumah' => $request->no_rumah,
@@ -34,19 +43,12 @@ class PenghuniController extends Controller
                 'harga' => $request->harga,
                 'keterangan' => $request->keterangan,
                 'foto' => $namaFile,
+                'rt_id' => $rtId
             ]);
-
-            Penghuni::where('status_huni', 'Kontrak')
-            ->whereNotNull('tanggal_keluar')
-            ->where('tanggal_keluar', '<', now())
-            ->update(['status' => 'Tidak Aktif']);
-
-            
 
             return redirect()->back()->with('success', 'Rumah berhasil ditambahkan');
         }
 
-        // 🔥 FIX UTAMA DI SINI
         $penghuni = Penghuni::with('rumah')->get();
         $rumahList = Rumah::with('penghuni')->get();
 
@@ -68,6 +70,7 @@ class PenghuniController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+
             'nama' => 'required|string|max:100',
             'no_ktp' => 'required|string|max:20|unique:penghuni,no_ktp',
             'email' => 'required|email|max:100|unique:penghuni,email',
@@ -80,8 +83,26 @@ class PenghuniController extends Controller
             'tanggal_keluar' => 'nullable|date|after_or_equal:tanggal_masuk',
         ]);
 
+                    if ($request->rumah_id) {
+
+                $rumah = \App\Models\Rumah::find($request->rumah_id);
+
+                if ($rumah && $rumah->rt_id) {
+
+                   $jumlah = \App\Models\Penghuni::whereHas('rumah', function ($q) use ($rumah) {
+                        $q->where('rt_id', $rumah->rt_id);
+                    })->count();
+
+                    if ($jumlah >= 10) {
+                        return back()->with('error', 'RT sudah penuh (max 10 penghuni)');
+                    }
+                }
+            }
+
      // 🔥 AUTO ISI TANGGAL MASUK
    $validated['tanggal_masuk'] = $request->input('tanggal_masuk') ?: now();
+
+   $validated['user_id'] = Auth::id();
 
     $penghuni = Penghuni::create($validated);
 
@@ -179,7 +200,6 @@ class PenghuniController extends Controller
             'status' => 'required',
         ]);
 
-        // 🔥 HANDLE FOTO
         $namaFile = null;
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
@@ -187,18 +207,26 @@ class PenghuniController extends Controller
             $file->move(public_path('foto_rumah'), $namaFile);
         }
 
-        Rumah::create([
+        // 🔥 INI YANG DIPAKAI
+       $rtId = $this->getRtOtomatis($request->blok);
+
+        if (!$rtId) {
+            return back()->with('error', 'Blok tidak dikenali!');
+        }
+
+        \App\Models\Rumah::create([
             'blok' => $request->blok,
             'no_rumah' => $request->no_rumah,
             'status' => $request->status,
             'luas_tanah' => $request->luas_tanah,
             'harga' => $request->harga,
             'keterangan' => $request->keterangan,
-            'foto' => $namaFile, // 🔥 TAMBAHAN
+            'foto' => $namaFile,
+            'rt_id' => $rtId
         ]);
 
-        return redirect()->back()->with('success', 'Rumah berhasil ditambahkan');
-    }
+            return redirect()->back()->with('success', 'Rumah berhasil ditambahkan');
+        }
 
     // =========================
     // EDIT RUMAH
@@ -228,6 +256,12 @@ class PenghuniController extends Controller
         'foto' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
     ]);
 
+    $rtId = $this->getRtOtomatis($request->blok);
+
+    if (!$rtId) {
+        return back()->with('error', 'Blok tidak dikenali!');
+    }
+
     $data = [
         'blok' => $request->blok,
         'no_rumah' => $request->no_rumah,
@@ -235,6 +269,7 @@ class PenghuniController extends Controller
         'luas_tanah' => $request->luas_tanah,
         'harga' => $request->harga,
         'keterangan' => $request->keterangan,
+        'rt_id' => $rtId
     ];
 
     // ===============================
@@ -285,8 +320,186 @@ class PenghuniController extends Controller
 
         public function indexRT()
     {
-        $penghuni = Penghuni::with('rumah')->get();
+        $rtId = Auth::id();
+
+        $penghuni = \App\Models\Penghuni::whereHas('rumah', function ($q) use ($rtId) {
+            $q->where('rt_id', $rtId);
+        })->get();
 
         return view('rt.penghuni.index', compact('penghuni'));
     }
+
+        public function bagiRT()
+    {
+        $rtList = User::where('role', 'rt')->get();
+        $rumahs = Rumah::orderBy('id')->get();
+
+        if ($rtList->count() == 0) {
+            return back()->with('error', 'RT belum ada!');
+        }
+
+        $rtIndex = 0;
+        $counter = 0;
+
+        foreach ($rumahs as $rumah) {
+
+            $rumah->rt_id = $rtList[$rtIndex]->id;
+            $rumah->save();
+
+            $counter++;
+
+            if ($counter == 10) {
+                $rtIndex++;
+                $counter = 0;
+
+                if ($rtIndex >= $rtList->count()) {
+                    $rtIndex = 0;
+                }
+            }
+        }
+
+        return back()->with('success', 'Pembagian RT berhasil!');
+    }
+
+        public function rumahRT()
+    {
+        $rtId = Auth::id();
+
+        $rumah = \App\Models\Rumah::where('rt_id', $rtId)->get();
+
+        return view('rt.rumah.index', compact('rumah'));
+    }
+
+        public function iuranRT()
+    {
+        $rtId = Auth::id();
+
+        $iuran = \App\Models\Iuran::whereHas('penghuni.rumah', function ($q) use ($rtId) {
+            $q->where('rt_id', $rtId);
+        })->get();
+
+        return view('rt.iuran.index', compact('iuran'));
+    }
+
+        public function dashboardRT()
+    {
+        $rtId = Auth::id();
+
+        $totalRumah = \App\Models\Rumah::where('rt_id', $rtId)->count();
+
+        $totalPenghuni = \App\Models\Penghuni::whereHas('rumah', function ($q) use ($rtId) {
+            $q->where('rt_id', $rtId);
+        })->count();
+
+        return view('rt.dashboard', compact('totalRumah', 'totalPenghuni'));
+    }
+    private function getRtOtomatis($blok)
+    {
+        if (!$blok) return null;
+
+        // 🔥 bersihin input
+        $blok = trim($blok);
+        $blok = strtoupper($blok);
+
+        $prefix = substr($blok, 0, 1);
+
+        $mapping = [
+            'D' => 13,
+            'E' => 19,
+            'C' => 28,
+            'B' => 34,
+        ];
+
+        return $mapping[$prefix] ?? null;
+    }
+
+    //     private function getRtOtomatis()
+    // {
+    //     $rtList = \App\Models\User::where('role', 'rt')->orderBy('id')->get();
+
+    //     if ($rtList->count() == 0) {
+    //         return null;
+    //     }
+
+    //     $jumlahRumah = \App\Models\Rumah::count();
+
+    //     // tiap 10 rumah pindah RT
+    //     $rtIndex = floor($jumlahRumah / 10);
+
+    //     // reset kalau melebihi jumlah RT
+    //     if ($rtIndex >= $rtList->count()) {
+    //         $rtIndex = 0;
+    //     }
+
+    //     return $rtList[$rtIndex]->id;
+    // }
+
+        public function layananRT()
+    {
+       $rtId = Auth::user()->id;
+
+        $data = Layanan::whereHas('penghuni', function ($q) use ($rtId) {
+            $q->where('rt_id', $rtId);
+        })->get();
+
+       return view('rt.layanan.index', ['layanan' => $data]);
+    }
+
+    public function home()
+    {
+        $user = Auth::user();
+
+        $penghuni = \App\Models\Penghuni::where('user_id', $user->id)->first();
+
+        $rumah = null;
+        $rtUser = null;
+
+        if ($penghuni && $penghuni->rumah) {
+            $rumah = $penghuni->rumah;
+
+            // 🔥 ambil user RT dari rt_id
+            $rtUser = \App\Models\User::where('id', $rumah->rt_id)
+                        ->where('role', 'rt')
+                        ->first();
+        }
+
+        return view('user.rumah', compact('penghuni', 'rumah', 'rtUser'));
+    }
+
+     public function editProfile()
+    {
+        $user = Auth::user();
+        return view('rt.profile.edit', compact('user'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = \App\Models\User::find(Auth::id());
+
+        $request->validate([
+            'photo' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
+        ]);
+
+        if ($request->hasFile('photo')) {
+
+            if ($user->photo && file_exists(public_path('profile/'.$user->photo))) {
+                unlink(public_path('profile/'.$user->photo));
+            }
+
+            $file = $request->file('photo');
+            $filename = time().'_'.$file->getClientOriginalName();
+
+            $file->move(public_path('profile'), $filename);
+
+            $user->photo = $filename;
+        }
+
+        $user->save();
+
+        Auth::login($user); // 🔥 penting
+
+        return back()->with('success', 'Foto berhasil diupdate!');
+    }
+
 }
+

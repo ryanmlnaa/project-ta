@@ -52,4 +52,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(\App\Models\Penghuni::class, 'email', 'email');
     }
+
+        public function rumahs()
+    {
+        return $this->hasMany(\App\Models\Rumah::class, 'rt_id');
+    }
 }
