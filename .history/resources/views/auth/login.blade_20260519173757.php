@@ -4,22 +4,18 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
+body {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    min-height: 100%;
+    min-height: 100vh;
     background: #0a3d1e;
-    overflow-x: hidden;
 }
 
 /* ─── WRAPPER ─── */
 .auth-wrapper {
     display: flex;
-    flex-direction: row;
     min-height: 100vh;
 }
 
@@ -136,7 +132,7 @@ html, body {
 /* ─── HEADER ─── */
 .card-header-area {
     text-align: center;
-    margin-bottom: 26px;
+    margin-bottom: 32px;
 }
 
 .card-header-area .badge-pill {
@@ -179,9 +175,18 @@ html, body {
 .alert-danger  { background: rgba(220,53,69,0.85);  color: #fff; }
 .alert-success { background: rgba(25,135,84,0.85);  color: #fff; }
 
-/* ─── FORM ─── */
+/* ─── FORM GROUP ─── */
 .form-group {
-    margin-bottom: 14px;
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    color: rgba(255,255,255,0.85);
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-bottom: 7px;
+    letter-spacing: 0.4px;
 }
 
 .input-wrap {
@@ -193,7 +198,8 @@ html, body {
     left: 13px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 14px;
+    color: rgba(0,0,0,0.3);
+    font-size: 15px;
     pointer-events: none;
 }
 
@@ -204,7 +210,7 @@ html, body {
     border: 1.5px solid rgba(255,255,255,0.2);
     background: rgba(255,255,255,0.94);
     color: #1a2e1a;
-    font-size: 16px; /* 16px cegah auto-zoom iOS */
+    font-size: 16px; /* 16px mencegah auto-zoom iOS */
     font-family: inherit;
     outline: none;
     transition: border 0.2s, box-shadow 0.2s;
@@ -227,11 +233,12 @@ html, body {
     transform: translateY(-50%);
     cursor: pointer;
     color: #888;
-    font-size: 14px;
+    font-size: 15px;
     background: none;
     border: none;
     padding: 0;
     line-height: 1;
+    /* area sentuh lebih besar di mobile */
     width: 36px;
     height: 36px;
     display: flex;
@@ -239,32 +246,32 @@ html, body {
     justify-content: center;
 }
 
-/* ─── BUTTON ─── */
-.btn-register {
+/* ─── LOGIN BUTTON ─── */
+.btn-login {
     width: 100%;
-    padding: 13px;
+    padding: 14px;
     border-radius: 10px;
     border: none;
     background: #ffffff;
     color: #1a6e3a;
-    font-size: 14.5px;
+    font-size: 15px;
     font-weight: 800;
     font-family: inherit;
     letter-spacing: 0.5px;
     cursor: pointer;
     transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
     box-shadow: 0 4px 18px rgba(0,0,0,0.15);
-    margin-top: 6px;
+    margin-top: 4px;
     -webkit-tap-highlight-color: transparent;
 }
 
-.btn-register:hover {
+.btn-login:hover {
     background: #f0faf4;
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 
-.btn-register:active {
+.btn-login:active {
     transform: translateY(0);
     background: #e4f5ec;
 }
@@ -272,7 +279,7 @@ html, body {
 /* ─── LINKS ─── */
 .links-area {
     text-align: center;
-    margin-top: 18px;
+    margin-top: 20px;
 }
 
 .links-area a {
@@ -284,140 +291,161 @@ html, body {
 
 .links-area a:hover { color: #fff; }
 
+.links-area .divider {
+    color: rgba(255,255,255,0.35);
+    margin: 0 8px;
+    font-size: 11px;
+}
+
 /* ─── RESPONSIVE: Tablet ─── */
-@media screen and (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 769px) and (max-width: 1024px) {
     .auth-left  { width: 40%; }
     .auth-right { width: 60%; padding: 40px 28px; }
     .auth-left img { width: 80%; }
 }
 
-/* ══════════════════════════════════════════
-   MOBILE ≤ 768px  —  LAYOUT: atas-bawah
-   ══════════════════════════════════════════ */
-@media screen and (max-width: 768px) {
+/* ─── RESPONSIVE: Mobile ─── */
+@media (max-width: 768px) {
+    html, body { overflow-x: hidden; }
 
     .auth-wrapper {
-        flex-direction: column !important;
+        flex-direction: column;
         min-height: 100vh;
     }
 
-    /* ── Panel Atas: Logo ── */
+    /* ── Panel Kiri: banner logo di atas ── */
     .auth-left {
-        width: 100% !important;
-        height: auto !important;
-        min-height: unset !important;
-        padding: 40px 24px 32px !important;
+        width: 100%;
+        height: auto;
+        padding: 44px 24px 36px;
         flex-shrink: 0;
-        background: linear-gradient(160deg, #ffffff 60%, #f0faf5 100%) !important;
-        order: 0;
+        /* gradient hijau tipis di background putih agar tidak terlalu polos */
+        background: linear-gradient(160deg, #ffffff 60%, #f0faf5 100%);
     }
 
     .auth-left img {
-        width: 50% !important;
-        max-width: 185px !important;
-        animation: none !important;
-        filter: drop-shadow(0 8px 20px rgba(15,80,40,0.14)) !important;
+        width: 48%;
+        max-width: 180px;
+        animation: none;
+        filter: drop-shadow(0 8px 20px rgba(15,80,40,0.14));
     }
 
     .auth-left .brand-tagline {
-        margin-top: 12px !important;
-        font-size: 10px !important;
-        letter-spacing: 2.5px !important;
+        margin-top: 12px;
+        font-size: 10px;
+        letter-spacing: 2.5px;
     }
 
+    /* Dekorasi lingkaran: sembunyikan yang besar, kecilkan yang kecil */
     .deco-circle.c1,
-    .deco-circle.c2 { display: none !important; }
-    .deco-circle.c3 { width: 90px !important; height: 90px !important; top: 12px !important; left: 12px !important; }
+    .deco-circle.c2 { display: none; }
+    .deco-circle.c3 { width: 90px; height: 90px; top: 12px; left: 12px; }
 
-    /* ── Panel Bawah: Form ── */
+    /* ── Panel Kanan: form di bawah, mengisi sisa layar ── */
     .auth-right {
-        width: 100% !important;
-        flex: 1 !important;
-        padding: 32px 24px 48px !important;
-        align-items: flex-start !important;
-        justify-content: center !important;
-        border-radius: 28px 28px 0 0 !important;
-        margin-top: -24px !important;
-        order: 1;
+        width: 100%;
+        flex: 1;
+        padding: 36px 24px 52px;
+        /* align atas agar tidak ada ruang kosong aneh di HP pendek */
+        align-items: flex-start;
+        justify-content: center;
+        /* border-radius atas untuk efek "card naik" */
+        border-radius: 28px 28px 0 0;
+        /* tarik ke atas sedikit agar overlap logo */
+        margin-top: -20px;
     }
 
     .auth-card {
-        max-width: 100% !important;
-        width: 100% !important;
+        max-width: 100%;
+        width: 100%;
     }
 
     .card-header-area {
-        margin-bottom: 20px !important;
+        margin-bottom: 24px;
     }
 
     .card-header-area .badge-pill {
-        font-size: 10px !important;
-        padding: 4px 12px !important;
+        font-size: 10px;
+        padding: 4px 12px;
     }
 
     .card-header-area h4 {
-        font-size: 16px !important;
+        font-size: 17px;
     }
 
     .card-header-area p {
-        font-size: 12px !important;
+        font-size: 12px;
     }
 
+    /* Form group sedikit lebih rapat */
     .form-group {
-        margin-bottom: 12px !important;
+        margin-bottom: 15px;
     }
 
+    .form-group label {
+        font-size: 12px;
+    }
+
+    /* Input lebih tinggi untuk kemudahan tap */
     .form-control {
-        padding: 12px 12px 12px 40px !important;
-        border-radius: 12px !important;
-        font-size: 16px !important;
+        padding: 13px 12px 13px 40px;
+        border-radius: 12px;
     }
 
-    .btn-register {
-        padding: 14px !important;
-        font-size: 15px !important;
-        border-radius: 12px !important;
-        margin-top: 8px !important;
+    /* Tombol login lebih besar */
+    .btn-login {
+        padding: 15px;
+        font-size: 15px;
+        border-radius: 12px;
+        margin-top: 8px;
     }
 
+    /* Link login: tumpuk vertikal, jarak nyaman */
     .links-area {
-        margin-top: 18px !important;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        margin-top: 22px;
     }
 
     .links-area a {
-        font-size: 13px !important;
-        padding: 4px 0 !important;
-        display: inline-block !important;
+        font-size: 13px;
+        /* area sentuh lebih besar */
+        padding: 4px 0;
+        display: inline-block;
     }
+
+    .links-area .divider { display: none; }
 }
 
-/* ─── Small Mobile ≤ 390px ─── */
-@media screen and (max-width: 390px) {
-    .auth-left { padding: 32px 16px 24px !important; }
-    .auth-left img { width: 46% !important; max-width: 160px !important; }
-    .auth-right { padding: 26px 20px 40px !important; }
+/* ─── RESPONSIVE: Small Mobile (≤ 390px) ─── */
+@media (max-width: 390px) {
+    .auth-left { padding: 36px 16px 28px; }
+    .auth-left img { width: 44%; max-width: 160px; }
+    .auth-right { padding: 28px 20px 44px; }
 }
 
 /* ─── Landscape Mobile ─── */
-@media screen and (max-width: 768px) and (orientation: landscape) {
+@media (max-width: 768px) and (orientation: landscape) {
     .auth-left {
-        padding: 18px 24px 16px !important;
+        padding: 24px 24px 20px;
     }
-    .auth-left img { width: 26% !important; max-width: 100px !important; }
-    .auth-left .brand-tagline { margin-top: 6px !important; font-size: 9px !important; }
+    .auth-left img { width: 30%; max-width: 120px; }
+    .auth-left .brand-tagline { margin-top: 8px; font-size: 9px; }
     .auth-right {
-        padding: 22px 24px 30px !important;
-        border-radius: 20px 20px 0 0 !important;
-        margin-top: -10px !important;
+        padding: 24px 24px 32px;
+        border-radius: 20px 20px 0 0;
+        margin-top: -12px;
     }
-    .card-header-area { margin-bottom: 12px !important; }
-    .form-group { margin-bottom: 9px !important; }
+    .card-header-area { margin-bottom: 16px; }
+    .form-group { margin-bottom: 12px; }
 }
 </style>
 
 <div class="auth-wrapper">
 
-    {{-- TOP / LEFT: Logo Panel --}}
+    {{-- LEFT: Logo Panel --}}
     <div class="auth-left">
         <div class="deco-circle c1"></div>
         <div class="deco-circle c2"></div>
@@ -426,73 +454,55 @@ html, body {
         <span class="brand-tagline">Real Estate &bull; Bondowoso</span>
     </div>
 
-    {{-- BOTTOM / RIGHT: Form Panel --}}
+    {{-- RIGHT: Form Panel --}}
     <div class="auth-right">
         <div class="blob-top"></div>
 
         <div class="auth-card">
 
             <div class="card-header-area">
-                <div class="badge-pill">✨ Daftar Akun</div>
+                <div class="badge-pill">🏡 Real Estate</div>
                 <h4>PT Tunggal Griya Sakinah<br>(GREEN VIEW)</h4>
-                <p>Buat akun penghuni baru</p>
+                <p>Kab. Bondowoso, Jawa Timur</p>
             </div>
 
             @if(session('error'))
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
 
-            @if($errors->any())
-                <div class="alert alert-danger">
-                    @foreach($errors->all() as $error)
-                        <div>{{ $error }}</div>
-                    @endforeach
-                </div>
-            @endif
-
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
-            <form method="POST" action="{{ route('register.proses') }}">
+            <form method="POST" action="{{ route('login.proses') }}">
                 @csrf
 
                 <div class="form-group">
+                    <label>Username / Email</label>
                     <div class="input-wrap">
                         <span class="icon">👤</span>
-                        <input name="name" class="form-control" placeholder="Nama Lengkap" value="{{ old('name') }}" required>
+                        <input type="text" name="login" class="form-control" placeholder="Masukkan username atau email" required autocomplete="username">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <div class="input-wrap">
-                        <span class="icon">🪪</span>
-                        <input name="username" class="form-control" placeholder="Username" value="{{ old('username') }}" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="input-wrap">
-                        <span class="icon">✉️</span>
-                        <input type="email" name="email" class="form-control" placeholder="Email" value="{{ old('email') }}" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
+                    <label>Password</label>
                     <div class="input-wrap">
                         <span class="icon">🔒</span>
-                        <input type="password" name="password" id="password" class="form-control" placeholder="Password" required autocomplete="new-password">
+                        <input type="password" name="password" id="password" class="form-control" placeholder="Masukkan password" required autocomplete="current-password">
                         <button type="button" class="toggle-eye" onclick="togglePassword()" aria-label="Tampilkan/sembunyikan password">👁</button>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-register">
-                    Daftar Sekarang
+                <button type="submit" class="btn-login">
+                    Login
                 </button>
             </form>
 
             <div class="links-area">
-                <a href="{{ route('login') }}">Sudah punya akun? Login di sini</a>
+                <a href="{{ route('register') }}">Belum punya akun? Register</a>
+                <span class="divider">|</span>
+                <a href="{{ route('password.forgot') }}">Lupa Password?</a>
             </div>
 
         </div>

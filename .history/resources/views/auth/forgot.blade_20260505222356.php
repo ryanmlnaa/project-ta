@@ -3,24 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Lupa Password - Green View</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html, body {
+    body {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        min-height: 100%;
+        height: 100vh;
+        overflow: hidden;
         background: #0a3d1e;
-        overflow-x: hidden;
     }
 
-    /* ─── WRAPPER ─── */
     .auth-wrapper {
         display: flex;
-        flex-direction: row;
-        min-height: 100vh;
+        height: 100vh;
     }
 
     /* ─── LEFT PANEL (Logo) ─── */
@@ -219,12 +217,10 @@
         border: 1.5px solid rgba(255,255,255,0.2);
         background: rgba(255,255,255,0.94);
         color: #1a2e1a;
-        font-size: 16px; /* cegah auto-zoom iOS */
+        font-size: 14px;
         font-family: inherit;
         outline: none;
         transition: border 0.2s, box-shadow 0.2s;
-        -webkit-appearance: none;
-        appearance: none;
     }
 
     .form-control::placeholder { color: #aab7aa; }
@@ -238,7 +234,7 @@
     /* ─── BUTTON ─── */
     .btn-submit {
         width: 100%;
-        padding: 13px;
+        padding: 12px;
         border-radius: 10px;
         border: none;
         background: #ffffff;
@@ -250,7 +246,6 @@
         cursor: pointer;
         transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
         box-shadow: 0 4px 18px rgba(0,0,0,0.15);
-        -webkit-tap-highlight-color: transparent;
     }
 
     .btn-submit:hover {
@@ -259,10 +254,7 @@
         box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     }
 
-    .btn-submit:active {
-        transform: translateY(0);
-        background: #e4f5ec;
-    }
+    .btn-submit:active { transform: translateY(0); }
 
     /* ─── LINKS ─── */
     .links-area {
@@ -279,139 +271,10 @@
 
     .links-area a:hover { color: #fff; }
 
-    /* ─── RESPONSIVE: Tablet ─── */
-    @media screen and (min-width: 769px) and (max-width: 1024px) {
-        .auth-left  { width: 40%; }
-        .auth-right { width: 60%; padding: 40px 28px; }
-        .auth-left img { width: 80%; }
-    }
-
-    /* ══════════════════════════════════════════
-       MOBILE ≤ 768px  —  LAYOUT: atas-bawah
-       ══════════════════════════════════════════ */
-    @media screen and (max-width: 768px) {
-
-        .auth-wrapper {
-            flex-direction: column !important;
-            min-height: 100vh;
-        }
-
-        /* ── Panel Atas: Logo ── */
-        .auth-left {
-            width: 100% !important;
-            height: auto !important;
-            min-height: unset !important;
-            padding: 44px 24px 36px !important;
-            flex-shrink: 0;
-            background: linear-gradient(160deg, #ffffff 60%, #f0faf5 100%) !important;
-            order: 0;
-        }
-
-        .auth-left img {
-            width: 50% !important;
-            max-width: 185px !important;
-            animation: none !important;
-            filter: drop-shadow(0 8px 20px rgba(15,80,40,0.14)) !important;
-        }
-
-        .auth-left .brand-tagline {
-            margin-top: 12px !important;
-            font-size: 10px !important;
-            letter-spacing: 2.5px !important;
-        }
-
-        .deco-circle.c1,
-        .deco-circle.c2 { display: none !important; }
-        .deco-circle.c3 { width: 90px !important; height: 90px !important; top: 12px !important; left: 12px !important; }
-
-        /* ── Panel Bawah: Form ── */
-        .auth-right {
-            width: 100% !important;
-            flex: 1 !important;
-            padding: 36px 24px 52px !important;
-            align-items: flex-start !important;
-            justify-content: center !important;
-            border-radius: 28px 28px 0 0 !important;
-            margin-top: -24px !important;
-            order: 1;
-        }
-
-        .auth-card {
-            max-width: 100% !important;
-            width: 100% !important;
-        }
-
-        .card-header-area {
-            margin-bottom: 20px !important;
-        }
-
-        .card-header-area .badge-pill {
-            font-size: 10px !important;
-            padding: 4px 12px !important;
-        }
-
-        .card-header-area h4 {
-            font-size: 18px !important;
-        }
-
-        .card-header-area p {
-            font-size: 12px !important;
-        }
-
-        .info-box {
-            font-size: 12px !important;
-            padding: 10px 12px !important;
-            margin-bottom: 18px !important;
-        }
-
-        .form-group {
-            margin-bottom: 14px !important;
-        }
-
-        .form-control {
-            padding: 13px 12px 13px 40px !important;
-            border-radius: 12px !important;
-            font-size: 16px !important;
-        }
-
-        .btn-submit {
-            padding: 14px !important;
-            font-size: 15px !important;
-            border-radius: 12px !important;
-        }
-
-        .links-area {
-            margin-top: 22px !important;
-        }
-
-        .links-area a {
-            font-size: 13px !important;
-            padding: 4px 0 !important;
-            display: inline-block !important;
-        }
-    }
-
-    /* ─── Small Mobile ≤ 390px ─── */
-    @media screen and (max-width: 390px) {
-        .auth-left { padding: 36px 16px 28px !important; }
-        .auth-left img { width: 46% !important; max-width: 160px !important; }
-        .auth-right { padding: 28px 20px 44px !important; }
-    }
-
-    /* ─── Landscape Mobile ─── */
-    @media screen and (max-width: 768px) and (orientation: landscape) {
-        .auth-left {
-            padding: 18px 24px 16px !important;
-        }
-        .auth-left img { width: 26% !important; max-width: 100px !important; }
-        .auth-left .brand-tagline { margin-top: 6px !important; font-size: 9px !important; }
-        .auth-right {
-            padding: 22px 24px 32px !important;
-            border-radius: 20px 20px 0 0 !important;
-            margin-top: -10px !important;
-        }
-        .card-header-area { margin-bottom: 14px !important; }
-        .form-group { margin-bottom: 10px !important; }
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+        .auth-left  { display: none; }
+        .auth-right { width: 100%; }
     }
     </style>
 </head>
@@ -420,7 +283,7 @@
 
 <div class="auth-wrapper">
 
-    {{-- TOP / LEFT: Logo Panel --}}
+    {{-- LEFT: Logo Panel --}}
     <div class="auth-left">
         <div class="deco-circle c1"></div>
         <div class="deco-circle c2"></div>
@@ -429,7 +292,7 @@
         <span class="brand-tagline">Real Estate &bull; Bondowoso</span>
     </div>
 
-    {{-- BOTTOM / RIGHT: Form Panel --}}
+    {{-- RIGHT: Form Panel --}}
     <div class="auth-right">
         <div class="blob-top"></div>
 
@@ -463,7 +326,7 @@
                 <div class="form-group">
                     <div class="input-wrap">
                         <span class="icon">✉️</span>
-                        <input type="email" name="email" class="form-control" placeholder="Masukkan email Anda" required autocomplete="email">
+                        <input type="email" name="email" class="form-control" placeholder="Masukkan email Anda" required>
                     </div>
                 </div>
 
