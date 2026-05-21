@@ -120,6 +120,7 @@ table.iv-table td { padding:16px 24px; font-size:14px; vertical-align:middle; }
 .iv-modal-footer { padding:16px 24px; background:#f8faf8; border-top:1px solid #eef2ee; text-align:right; }
 .iv-modal-btn-close { padding:9px 22px; border-radius:10px; border:none; background:#1a3d1a; color:#7edd7e; font-size:13px; font-weight:700; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; transition:opacity 0.2s; }
 .iv-modal-btn-close:hover { opacity:0.85; }
+
 .iv-badge-amber { background:#fef3c7; color:#a16207; }
 </style>
 

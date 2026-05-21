@@ -11,10 +11,9 @@
 
         {{-- ✅ NOTIFIKASI SUCCESS --}}
         @if(session('success'))
-            <div
-                style="background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #064e3b;
-                                                            color:#065f46; border-radius:10px; padding:12px 16px; font-size:13px;
-                                                            font-weight:600; display:flex; align-items:center; gap:8px; margin:16px 20px;">
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #064e3b;
+                            color:#065f46; border-radius:10px; padding:12px 16px; font-size:13px;
+                            font-weight:600; display:flex; align-items:center; gap:8px; margin:16px 20px;">
                 <i class="fas fa-check-circle"></i> {{ session('success') }}
             </div>
         @endif
@@ -243,7 +242,7 @@
                             </div>
                             <span
                                 class="gv-pengaduan-status
-                                                                    {{ $p->status == 'selesai' ? 'selesai' : ($p->status == 'diproses' ? 'diproses' : 'diajukan') }}">
+                                    {{ $p->status == 'selesai' ? 'selesai' : ($p->status == 'diproses' ? 'diproses' : 'diajukan') }}">
                                 {{ ucfirst($p->status) }}
                             </span>
                         </div>
@@ -311,8 +310,8 @@
 
     <style>
         /* =============================================
-                           VARIABLES & RESET
-                        ============================================= */
+           VARIABLES & RESET
+        ============================================= */
         .gv-container {
             padding: 0 5%;
         }
@@ -364,8 +363,8 @@
         }
 
         /* =============================================
-                           ALERT BANNER
-                        ============================================= */
+           ALERT BANNER
+        ============================================= */
         .gv-alert-banner {
             background: var(--gv-red-light);
             border-bottom: 1px solid rgba(220, 38, 38, 0.2);
@@ -420,8 +419,8 @@
         }
 
         /* =============================================
-                           HERO
-                        ============================================= */
+           HERO
+        ============================================= */
         .gv-hero {
             position: relative;
             overflow: hidden;
@@ -589,8 +588,8 @@
         }
 
         /* =============================================
-                           SECTION LAYOUT
-                        ============================================= */
+           SECTION LAYOUT
+        ============================================= */
         .gv-section {
             width: 100%;
             padding: 4rem 5%;
@@ -716,8 +715,8 @@
         }
 
         /* =============================================
-                           SLIDER
-                        ============================================= */
+           SLIDER
+        ============================================= */
         .gv-slider {
             position: relative;
             border-radius: var(--gv-radius);
@@ -890,8 +889,8 @@
         }
 
         /* =============================================
-                           INFO GRID
-                        ============================================= */
+           INFO GRID
+        ============================================= */
         .gv-info-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -1025,8 +1024,8 @@
         }
 
         /* =============================================
-                           IURAN CARDS
-                        ============================================= */
+           IURAN CARDS
+        ============================================= */
         .gv-iuran-card {
             background: var(--gv-surface);
             border: 1px solid var(--gv-border);
@@ -1235,8 +1234,8 @@
         }
 
         /* =============================================
-                           PENGADUAN CARDS
-                        ============================================= */
+           PENGADUAN CARDS
+        ============================================= */
         .gv-pengaduan-card {
             background: var(--gv-surface);
             border: 1px solid var(--gv-border);
@@ -1425,8 +1424,8 @@
         }
 
         /* =============================================
-                           EMPTY STATE
-                        ============================================= */
+           EMPTY STATE
+        ============================================= */
         .gv-empty {
             background: var(--gv-surface);
             border: 2px dashed var(--gv-border);
@@ -1458,8 +1457,8 @@
         }
 
         /* =============================================
-                           RESPONSIVE
-                        ============================================= */
+           RESPONSIVE
+        ============================================= */
         @media(max-width:768px) {
             .gv-hero {
                 padding: 4rem 1.5rem 3rem;
@@ -1494,102 +1493,58 @@
         }
 
         /* =============================================
-                   CLOCK WIDGET
-                ============================================= */
-        .gv-clock-widget {
-            position: absolute;
-            top: 2rem;
-            right: 2rem;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(5, 150, 105, 0.15);
-            border-radius: 16px;
-            padding: 14px 22px;
-            text-align: center;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-            min-width: 170px;
-        }
+   CLOCK WIDGET
+============================================= */
+.gv-clock-widget {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    z-index: 10;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(5,150,105,0.15);
+    border-radius: 16px;
+    padding: 14px 22px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    min-width: 170px;
+}
+.gv-clock-time {
+    font-family: var(--gv-font);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--gv-text);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+.gv-clock-time span.gv-clock-colon {
+    animation: blinkColon 1s step-end infinite;
+    display: inline-block;
+}
+@keyframes blinkColon {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+.gv-clock-date {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--gv-green);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
 
-        .gv-clock-time {
-            font-family: var(--gv-font);
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--gv-text);
-            letter-spacing: 0.04em;
-            line-height: 1;
-            margin-bottom: 6px;
-        }
-
-        .gv-clock-time span.gv-clock-colon {
-            animation: blinkColon 1s step-end infinite;
-            display: inline-block;
-        }
-
-        @keyframes blinkColon {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0;
-            }
-        }
-
-        .gv-clock-date {
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--gv-green);
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-
-        @media(max-width: 768px) {
-            .gv-clock-widget {
-                position: relative;
-                top: auto;
-                right: auto;
-                margin: 0 auto 1.5rem auto;
-                display: inline-flex;
-                align-items: center;
-                gap: 10px;
-                padding: 10px 18px;
-                border-radius: 50px;
-                min-width: 0;
-                width: auto;
-            }
-
-            .gv-clock-time {
-                font-size: 1.1rem;
-                margin-bottom: 0;
-                line-height: 1;
-            }
-
-            .gv-clock-date {
-                font-size: 0.65rem;
-                text-align: left;
-            }
-        }
-
-        @media(max-width: 400px) {
-            .gv-clock-widget {
-                top: 0.4rem;
-                right: 0.4rem;
-                padding: 6px 10px;
-                border-radius: 10px;
-            }
-
-            .gv-clock-time {
-                font-size: 1.1rem;
-            }
-
-            .gv-clock-date {
-                font-size: 0.58rem;
-            }
-        }
+@media(max-width: 768px) {
+    .gv-clock-widget {
+        top: 1rem;
+        right: 1rem;
+        padding: 10px 14px;
+        min-width: 140px;
+    }
+    .gv-clock-time { font-size: 1.5rem; }
+    .gv-clock-date { font-size: 0.65rem; }
+}
     </style>
 
     @push('scripts')
@@ -1622,38 +1577,6 @@
                 setInterval(nextSlide, 4000);
 
             });
-
-            // ── CLOCK WIDGET ──
-            function updateClockWidget() {
-                const now = new Date();
-                const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-                const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-
-                const hari = days[now.getDay()];
-                const tgl = String(now.getDate()).padStart(2, '0');
-                const bln = months[now.getMonth()];
-                const thn = now.getFullYear();
-                const jam = String(now.getHours()).padStart(2, '0');
-                const menit = String(now.getMinutes()).padStart(2, '0');
-                const detik = String(now.getSeconds()).padStart(2, '0');
-
-                // Jam dengan titik dua berkedip
-                const timeEl = document.getElementById('gv-clock-time');
-                if (timeEl) {
-                    timeEl.innerHTML =
-                        `${jam}<span class="gv-clock-colon">:</span>${menit}<span class="gv-clock-colon">:</span>${detik}`;
-                }
-
-                // Tanggal lengkap
-                const dateEl = document.getElementById('gv-clock-date');
-                if (dateEl) {
-                    dateEl.textContent = `${hari}, ${tgl} ${bln} ${thn}`;
-                }
-            }
-
-            updateClockWidget();
-            setInterval(updateClockWidget, 1000);
         </script>
     @endpush
 @endsection

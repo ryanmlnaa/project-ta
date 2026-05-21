@@ -120,7 +120,6 @@ table.iv-table td { padding:16px 24px; font-size:14px; vertical-align:middle; }
 .iv-modal-footer { padding:16px 24px; background:#f8faf8; border-top:1px solid #eef2ee; text-align:right; }
 .iv-modal-btn-close { padding:9px 22px; border-radius:10px; border:none; background:#1a3d1a; color:#7edd7e; font-size:13px; font-weight:700; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; transition:opacity 0.2s; }
 .iv-modal-btn-close:hover { opacity:0.85; }
-.iv-badge-amber { background:#fef3c7; color:#a16207; }
 </style>
 
 <div class="iv-wrap">
@@ -140,7 +139,7 @@ table.iv-table td { padding:16px 24px; font-size:14px; vertical-align:middle; }
   $belum  = $iuran->filter(fn($x) => $x->status != 'lunas' && !$x->bukti_pembayaran)->count();
   $total  = $iuran->where('status','lunas')->sum('jumlah');
   $pct    = $iuran->count() > 0 ? round($lunas / $iuran->count() * 100) : 0;
-  @endphp
+@endphp
   <div class="iv-stats fade-up d2">
     <div class="iv-stat-card green">
       <div class="iv-stat-icon"><i class="fas fa-check-circle"></i></div>
@@ -215,7 +214,7 @@ table.iv-table td { padding:16px 24px; font-size:14px; vertical-align:middle; }
           </thead>
           <tbody id="iuranBody">
             @forelse($iuran as $i)
-            <tr data-status="{{ $i->status == 'lunas' ? 'lunas' : ($i->bukti_pembayaran ? 'proses' : 'belum') }}">
+            <tr data-status="{{ $i->status == 'lunas' ? 'lunas' : 'belum' }}">
               <td>
                 <div class="iv-month-cell">
                   <div class="iv-month-icon"><i class="fas fa-calendar-alt"></i></div>
@@ -234,34 +233,26 @@ table.iv-table td { padding:16px 24px; font-size:14px; vertical-align:middle; }
               </td>
               <td>
                 @if($i->status == 'lunas')
-                    <div class="iv-status-paid">
+                  <div class="iv-status-paid">
                     <div class="iv-status-dot"></div> Lunas
-                    </div>
-                @elseif($i->status == 'rt')
-                    <span class="iv-badge iv-badge-blue">⏳ Menunggu Admin</span>
-                @elseif($i->bukti_pembayaran)
-                    <span class="iv-badge iv-badge-amber">⏳ Menunggu RT</span>
+                  </div>
                 @else
-                    <span class="iv-badge iv-badge-red">⚠ Belum Bayar</span>
+                  <span class="iv-badge iv-badge-red">⚠ Belum Bayar</span>
                 @endif
               </td>
-              {{-- JADI --}}
-            <td style="text-align:right">
-            @if($i->status == 'lunas')
-                <button class="iv-btn-detail"
-                data-toggle="modal"
-                data-target="#modalDetail{{ $i->id }}">
-                🧾 Detail
-                </button>
-            @elseif($i->bukti_pembayaran)
-                {{-- Sudah upload bukti, sedang diproses — tidak ada aksi --}}
-                <span style="font-size:12px; color:#9aaa9a; font-style:italic;">Sedang diproses</span>
-            @else
-                <a href="{{ route('user.iuran.upload', $i->id) }}" class="iv-btn-pay">
-                <i class="fas fa-credit-card"></i> Bayar
-                </a>
-            @endif
-            </td>
+              <td style="text-align:right">
+                @if($i->status == 'lunas')
+                  <button class="iv-btn-detail"
+                    data-toggle="modal"
+                    data-target="#modalDetail{{ $i->id }}">
+                    🧾 Detail
+                  </button>
+                @else
+                  <a href="{{ route('user.iuran.upload', $i->id) }}" class="iv-btn-pay">
+                    <i class="fas fa-credit-card"></i> Bayar
+                  </a>
+                @endif
+              </td>
             </tr>
             @empty
             <tr>

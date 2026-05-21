@@ -120,7 +120,6 @@ table.iv-table td { padding:16px 24px; font-size:14px; vertical-align:middle; }
 .iv-modal-footer { padding:16px 24px; background:#f8faf8; border-top:1px solid #eef2ee; text-align:right; }
 .iv-modal-btn-close { padding:9px 22px; border-radius:10px; border:none; background:#1a3d1a; color:#7edd7e; font-size:13px; font-weight:700; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; transition:opacity 0.2s; }
 .iv-modal-btn-close:hover { opacity:0.85; }
-.iv-badge-amber { background:#fef3c7; color:#a16207; }
 </style>
 
 <div class="iv-wrap">
@@ -246,22 +245,22 @@ table.iv-table td { padding:16px 24px; font-size:14px; vertical-align:middle; }
                 @endif
               </td>
               {{-- JADI --}}
-            <td style="text-align:right">
-            @if($i->status == 'lunas')
-                <button class="iv-btn-detail"
-                data-toggle="modal"
-                data-target="#modalDetail{{ $i->id }}">
-                🧾 Detail
-                </button>
-            @elseif($i->bukti_pembayaran)
-                {{-- Sudah upload bukti, sedang diproses — tidak ada aksi --}}
-                <span style="font-size:12px; color:#9aaa9a; font-style:italic;">Sedang diproses</span>
-            @else
-                <a href="{{ route('user.iuran.upload', $i->id) }}" class="iv-btn-pay">
-                <i class="fas fa-credit-card"></i> Bayar
-                </a>
-            @endif
-            </td>
+<td style="text-align:right">
+  @if($i->status == 'lunas')
+    <button class="iv-btn-detail"
+      data-toggle="modal"
+      data-target="#modalDetail{{ $i->id }}">
+      🧾 Detail
+    </button>
+  @elseif($i->bukti_pembayaran)
+    {{-- Sudah upload bukti, sedang diproses — tidak ada aksi --}}
+    <span style="font-size:12px; color:#9aaa9a; font-style:italic;">Sedang diproses</span>
+  @else
+    <a href="{{ route('user.iuran.upload', $i->id) }}" class="iv-btn-pay">
+      <i class="fas fa-credit-card"></i> Bayar
+    </a>
+  @endif
+</td>
             </tr>
             @empty
             <tr>
