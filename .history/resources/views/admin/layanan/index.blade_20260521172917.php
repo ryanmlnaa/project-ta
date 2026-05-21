@@ -456,8 +456,8 @@ div.dataTables_wrapper div.dataTables_paginate .paginate_button.disabled:hover {
                     @endforelse
                 </tbody>
            </table>
-            </div>  {{-- tutup table-responsive-wrapper --}}
-        </div>
+    </div>  {{-- tutup table-responsive-wrapper --}}
+</div>
     </div>
 
 </div>

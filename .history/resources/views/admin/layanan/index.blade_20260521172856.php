@@ -342,8 +342,8 @@ div.dataTables_wrapper div.dataTables_paginate .paginate_button.disabled:hover {
         </div>
 
        <div class="premium-card-body" style="padding: 0;">
-        <div class="table-responsive-wrapper">
-        <table class="premium-table" id="dataTable" style="width:100%">
+    <div class="table-responsive-wrapper">
+    <table class="premium-table" id="dataTable" style="width:100%">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -455,8 +455,7 @@ div.dataTables_wrapper div.dataTables_paginate .paginate_button.disabled:hover {
                         </tr>
                     @endforelse
                 </tbody>
-           </table>
-            </div>  {{-- tutup table-responsive-wrapper --}}
+            </table>
         </div>
     </div>
 
