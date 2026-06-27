@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Iuran extends Model
+{
+    use HasFactory;
+
+    protected $table = 'iuran';
+
+    protected $fillable = [
+        'penghuni_id',
+        'rt_id',
+        'bulan',
+        'tahun',
+        'jumlah',
+        'jenis_iuran',
+        'keterangan',
+        'status',
+        'tanggal_bayar',
+        'bukti_pembayaran', // 🔥 tambahin ini (untuk upload nanti)
+    ];
+
+    // 🔥 OPTIONAL (biar otomatis format tanggal)
+    protected $casts = [
+        'tanggal_bayar' => 'date',
+    ];
+
+    // Relasi ke penghuni
+    public function penghuni()
+    {
+        return $this->belongsTo(Penghuni::class, 'penghuni_id');
+    }
+}
